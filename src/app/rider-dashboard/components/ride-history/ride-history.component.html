@@ -1,0 +1,24 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Ride History</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content *ngIf="!isLoading">
+  <ion-list *ngIf="rides.length > 0; else noHistory">
+    <ion-item *ngFor="let ride of rides">
+      <ion-label>
+        <h2>Pickup: {{ ride.pickup }}</h2>
+        <p>Dropoff: {{ ride.dropoff }}</p>
+        <p>Status: {{ ride.status }}</p>
+        <p>Price: ₱{{ ride.price }}</p>
+      </ion-label>
+    </ion-item>
+  </ion-list>
+
+  <ng-template #noHistory>
+    <ion-item>
+      <ion-label>No completed rides found.</ion-label>
+    </ion-item>
+  </ng-template>
+</ion-content>

@@ -1,0 +1,63 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Account</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <div *ngIf="isLoading" class="loading-container">
+    <ion-spinner name="crescent"></ion-spinner>
+  </div>
+
+  <div *ngIf="!isLoading">
+    <ion-item lines="none">
+      <ion-label position="floating">Full Name</ion-label>
+      <ion-input [(ngModel)]="userProfile.fullName"></ion-input>
+    </ion-item>
+
+    <ion-item lines="none">
+      <ion-label position="floating">Email</ion-label>
+      <ion-input [(ngModel)]="userProfile.email" disabled></ion-input>
+    </ion-item>
+
+    <ion-item lines="none">
+      <ion-label position="floating">Mobile Number</ion-label>
+      <ion-input [(ngModel)]="userProfile.mobileNumber"></ion-input>
+    </ion-item>
+
+    <ion-button expand="full" (click)="updateProfile(userProfile)">
+      Update Profile
+    </ion-button>
+
+    <ion-item lines="none">
+      <ion-label position="floating">New Password</ion-label>
+      <ion-input 
+        [(ngModel)]="userProfile.newPassword" 
+        [type]="showNewPassword ? 'text' : 'password'">
+        <ion-button fill="clear" slot="end" (click)="toggleNewPasswordVisibility()">
+          <ion-icon slot="icon-only" name="{{ showNewPassword ? 'eye-off' : 'eye' }}"></ion-icon>
+        </ion-button>
+      </ion-input>
+    </ion-item>
+
+    <ion-item lines="none">
+      <ion-label position="floating">Confirm New Password</ion-label>
+      <ion-input 
+        [(ngModel)]="userProfile.confirmPassword" 
+        [type]="showConfirmPassword ? 'text' : 'password'">
+        <ion-button fill="clear" slot="end" (click)="toggleConfirmPasswordVisibility()">
+          <ion-icon slot="icon-only" name="{{ showConfirmPassword ? 'eye-off' : 'eye' }}"></ion-icon>
+        </ion-button>
+      </ion-input>
+    </ion-item>
+
+    <ion-button expand="full" color="primary" (click)="changePassword()">
+      Change Password
+    </ion-button>
+
+    <ion-item button color="danger" (click)="onLogout()">
+      <ion-icon name="log-out-outline" slot="start"></ion-icon>
+      <ion-label>Logout</ion-label>
+    </ion-item>
+  </div>
+</ion-content>

@@ -1,0 +1,29 @@
+<ion-content class="ion-padding">
+  <ion-grid>
+    <ion-row>
+      <ion-col><strong>Full Name</strong></ion-col>
+      <ion-col><strong>Status</strong></ion-col>
+      <ion-col><strong>Email</strong></ion-col>
+      <ion-col><strong>Mobile</strong></ion-col>
+      <ion-col><strong>Actions</strong></ion-col>
+    </ion-row>
+
+    <ion-row *ngFor="let customer of customer">
+      <ion-col>{{ customer.fullName }}</ion-col>
+      <ion-col>{{ customer.status }}</ion-col>
+      <ion-col>{{ customer.email }}</ion-col>
+      <ion-col>{{ customer.mobileNumber }}</ion-col>
+      <ion-col>
+        <ion-button size="small" color="success" (click)="activateCustomer(customer)" *ngIf="customer.status !== 'active'">
+          Activate
+        </ion-button>
+        <ion-button size="small" color="warning" (click)="deactivateCustomer(customer)" *ngIf="customer.status === 'active'">
+          Deactivate
+        </ion-button>
+        <ion-button size="small" color="danger" (click)="deleteCustomer(customer.userId)">
+          Delete
+        </ion-button>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
+</ion-content>

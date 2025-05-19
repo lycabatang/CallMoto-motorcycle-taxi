@@ -1,0 +1,30 @@
+<ion-tabs>
+  <ion-tab-bar slot="bottom">
+    <ion-tab-button tab="active-rides" [routerLink]="['/rider-dashboard/active-rides']" routerLinkActive="selected">
+      <ion-icon name="car-sport"></ion-icon>
+      <ion-label>Active Rides</ion-label>
+    </ion-tab-button>
+
+    <ion-tab-button tab="ride-history" [routerLink]="['/rider-dashboard/ride-history']" routerLinkActive="selected">
+      <ion-icon name="time"></ion-icon>
+      <ion-label>Ride History</ion-label>
+    </ion-tab-button>
+
+    <ion-tab-button tab="profile" [routerLink]="['/rider-dashboard/profile']" routerLinkActive="selected">
+      <ion-icon name="person"></ion-icon>
+      <ion-label>Profile</ion-label>
+    </ion-tab-button>
+
+    <ion-tab-button tab="notifications" [routerLink]="['/rider-dashboard/notifications']" routerLinkActive="selected">
+      <ion-icon name="notifications"></ion-icon>
+      <ion-label>Notifications</ion-label>
+    </ion-tab-button>
+
+    <ion-tab-button tab="chat" [routerLink]="['/rider-dashboard/chat']" routerLinkActive="selected">
+      <ion-icon name="chatbubble"></ion-icon>
+      <ion-label>Chat</ion-label>
+    </ion-tab-button>
+  </ion-tab-bar>
+</ion-tabs>
+
+<router-outlet></router-outlet>

@@ -1,0 +1,29 @@
+<ion-content class="ion-padding">
+  <ion-grid>
+    <ion-row>
+      <ion-col><strong>Full Name</strong></ion-col>
+      <ion-col><strong>Status</strong></ion-col>
+      <ion-col><strong>Email</strong></ion-col>
+      <ion-col><strong>Mobile</strong></ion-col>
+      <ion-col><strong>Actions</strong></ion-col>
+    </ion-row>
+
+    <ion-row *ngFor="let rider of riders">
+      <ion-col>{{ rider.fullName }}</ion-col>
+      <ion-col>{{ rider.status }}</ion-col>
+      <ion-col>{{ rider.email }}</ion-col>
+      <ion-col>{{ rider.mobileNumber }}</ion-col>
+      <ion-col>
+        <ion-button size="small" color="success" (click)="activateRider(rider)" *ngIf="rider.status !== 'active'">
+          Activate
+        </ion-button>
+        <ion-button size="small" color="warning" (click)="deactivateRider(rider)" *ngIf="rider.status === 'active'">
+          Deactivate
+        </ion-button>
+        <ion-button size="small" color="danger" (click)="deleteRider(rider.userId)">
+          Delete
+        </ion-button>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
+</ion-content>

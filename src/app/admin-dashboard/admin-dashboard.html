@@ -1,0 +1,21 @@
+<ion-tabs>
+  <ion-tab-bar slot="bottom">
+    <ion-tab-button tab="rider-lists" [routerLink]="['rider-lists']" routerLinkActive="selected">
+      <ion-label>Rider Lists</ion-label>
+    </ion-tab-button>
+
+    <ion-tab-button tab="customer-lists" [routerLink]="['customer-lists']" routerLinkActive="selected">
+      <ion-label>Customer Lists</ion-label>
+    </ion-tab-button>
+
+    <ion-tab-button tab="profile" [routerLink]="['profile']" routerLinkActive="selected">
+      <ion-label>Profile</ion-label>
+    </ion-tab-button>
+
+    <ion-tab-button tab="register" [routerLink]="['register']" routerLinkActive="selected">
+      <ion-label>Register</ion-label>
+    </ion-tab-button>
+  </ion-tab-bar>
+</ion-tabs>
+
+<router-outlet></router-outlet>

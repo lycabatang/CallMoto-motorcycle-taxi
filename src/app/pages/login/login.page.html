@@ -1,0 +1,51 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Login</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+    <div class="login-container">
+      <div class="logo-section ion-text-center ion-margin-bottom">
+        <h1 style="color: white; font-size: 32px; margin-bottom: 10px;">CallMoto</h1>
+        <p style="color: rgba(255,255,255,0.8); margin-bottom: 40px;">Book your ride with ease</p>
+      </div>
+
+      <ion-item>
+        <ion-label position="floating">Email</ion-label>
+        <ion-input type="email" formControlName="email"></ion-input>
+      </ion-item>
+      <div class="error-message" *ngIf="loginForm.get('email')?.touched && loginForm.get('email')?.errors?.['required']">
+        Email is required
+      </div>
+      <div class="error-message" *ngIf="loginForm.get('email')?.touched && loginForm.get('email')?.errors?.['email']">
+        Please enter a valid email
+      </div>
+
+      <ion-item>
+        <ion-label position="floating">Password</ion-label>
+        <ion-input [type]="passwordType" formControlName="password"></ion-input>
+        <ion-icon
+          [name]="passwordType === 'password' ? 'eye-off' : 'eye'"
+          slot="end"
+          class="password-toggle-icon"
+          (click)="togglePassword()"
+          style="cursor: pointer;">
+        </ion-icon>
+      </ion-item>
+      <div class="error-message" *ngIf="loginForm.get('password')?.touched && loginForm.get('password')?.errors?.['required']">
+        Password is required
+      </div>
+      
+      <ion-button expand="block" type="submit" [disabled]="!loginForm.valid">
+        <ion-icon name="log-in-outline" slot="start"></ion-icon>
+        Login
+      </ion-button>
+
+      <div class="signup-section">
+        <p class="signup-text" routerLink="/signup" style="cursor: pointer;">Don't have an account?</p>
+      </div>
+    </div>
+  </form>
+</ion-content>

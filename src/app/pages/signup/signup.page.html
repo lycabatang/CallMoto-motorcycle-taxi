@@ -1,0 +1,82 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Sign Up</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <div class="signup-container">
+    <div class="logo-section ion-text-center ion-margin-bottom">
+      <h1 style="color: white; font-size: 32px; margin-bottom: 10px;">CallMoto</h1>
+      <p style="color: rgba(255,255,255,0.8); margin-bottom: 40px;">Create your account</p>
+    </div>
+
+    <form [formGroup]="signupForm" (ngSubmit)="onSubmit()">
+      <ion-item>
+        <ion-label position="floating">First Name</ion-label>
+        <ion-input type="text" formControlName="firstName"></ion-input>
+      </ion-item>
+
+      <ion-item>
+        <ion-label position="floating">Middle Name</ion-label>
+        <ion-input type="text" formControlName="middleName"></ion-input>
+      </ion-item>
+
+      <ion-item>
+        <ion-label position="floating">Last Name</ion-label>
+        <ion-input type="text" formControlName="lastName"></ion-input>
+      </ion-item>
+
+      <ion-item>
+        <ion-label position="floating">Suffix (optional)</ion-label>
+        <ion-input type="text" formControlName="suffix"></ion-input>
+      </ion-item>
+
+      <ion-item>
+        <ion-label position="floating">Email</ion-label>
+        <ion-input type="email" formControlName="email"></ion-input>
+      </ion-item>
+
+      <ion-item>
+        <ion-label position="floating">Mobile Number</ion-label>
+        <ion-input
+          type="tel"
+          [value]="'+' + countryCode + mobileNumber"
+          (ionInput)="onMobileInput($event)"
+          (keypress)="validateKeyPress($event)"
+          inputmode="numeric"
+          maxlength="13"
+        ></ion-input>
+      </ion-item>
+
+      <ion-item>
+        <ion-label position="floating">Address</ion-label>
+        <ion-textarea rows="3" formControlName="address"></ion-textarea>
+      </ion-item>
+
+      <ion-item>
+        <ion-label position="floating">Password</ion-label>
+        <ion-input [type]="passwordType" formControlName="password"></ion-input>
+        <ion-icon *ngIf="passwordType === 'password'" name="eye-off" slot="end" (click)="togglePassword()"></ion-icon>
+        <ion-icon *ngIf="passwordType === 'text'" name="eye" slot="end" (click)="togglePassword()"></ion-icon>
+      </ion-item>
+
+      <ion-item>
+        <ion-label position="floating">Confirm Password</ion-label>
+        <ion-input [type]="confirmPasswordType" formControlName="confirmPassword"></ion-input>
+        <ion-icon *ngIf="confirmPasswordType === 'password'" name="eye-off" slot="end" (click)="toggleConfirmPassword()"></ion-icon>
+        <ion-icon *ngIf="confirmPasswordType === 'text'" name="eye" slot="end" (click)="toggleConfirmPassword()"></ion-icon>
+      </ion-item>
+
+      <ion-button expand="block" type="submit">
+        <ion-icon name="person-add-outline" slot="start"></ion-icon>
+        Sign Up
+      </ion-button>
+
+      <ion-button expand="block" fill="clear" routerLink="/login">
+        <ion-icon name="arrow-back-outline" slot="start"></ion-icon>
+        Back to Login
+      </ion-button>
+    </form>
+  </div>
+</ion-content>

@@ -1,0 +1,23 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-title>Messages</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <ion-list>
+    <ion-item *ngFor="let message of messages" button detail="true">
+      <ion-avatar slot="start">
+        <img [src]="message.avatar" alt="avatar"/>
+      </ion-avatar>
+      <ion-label>
+        <div class="message-header">
+          <h2>{{message.sender}}</h2>
+          <p class="timestamp">{{message.timestamp}}</p>
+        </div>
+        <p [class.unread]="message.unread">{{message.text}}</p>
+      </ion-label>
+      <ion-badge *ngIf="message.unread" color="primary" slot="end">New</ion-badge>
+    </ion-item>
+  </ion-list>
+</ion-content>

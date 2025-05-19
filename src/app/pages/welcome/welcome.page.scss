@@ -1,0 +1,44 @@
+.welcome-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100%;
+  text-align: center;
+  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+  padding: 2rem;
+
+  h1 {
+    font-size: 2.8rem;
+    font-weight: 700;
+    color: #1a237e;
+    margin-bottom: 1.5rem;
+    letter-spacing: -0.5px;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  }
+
+  p {
+    font-size: 1.3rem;
+    line-height: 1.6;
+    color: #455a64;
+    margin-bottom: 2.5rem;
+    max-width: 85%;
+    font-weight: 400;
+  }
+
+  ion-button {
+    width: 85%;
+    max-width: 320px;
+    margin: 0.5rem auto;
+    height: 48px;
+    --border-radius: 12px;
+    --box-shadow: 0 4px 12px rgba(56, 128, 255, 0.2);
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    text-transform: none;
+    
+    &::part(native) {
+      padding: 1rem;
+    }
+  }
+}

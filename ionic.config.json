@@ -1,0 +1,7 @@
+{
+  "name": "callmoto",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "angular"
+}

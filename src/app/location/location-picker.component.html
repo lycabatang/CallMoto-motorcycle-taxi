@@ -1,0 +1,43 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-button (click)="cancel()">
+        <ion-icon name="close"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+    <ion-title>Select Location</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="confirmLocation()" [disabled]="!searchAddress">Confirm</ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <div class="search-container">
+    <ion-item>
+      <ion-icon name="search" slot="start"></ion-icon>
+      <ion-input [(ngModel)]="searchAddress" placeholder="Search for address" (keyup.enter)="searchLocation()"></ion-input>
+      <ion-button slot="end" fill="clear" (click)="searchLocation()">
+        <ion-icon name="search-outline"></ion-icon>
+      </ion-button>
+    </ion-item>
+  </div>
+
+  <div class="map-container">
+    <div #map id="map" [class.loading]="loading"></div>
+    <div class="map-loading" *ngIf="loading">
+      <ion-spinner></ion-spinner>
+      <p>Loading map...</p>
+    </div>
+  </div>
+
+  <div class="address-container" *ngIf="searchAddress">
+    <ion-item lines="none">
+      <ion-icon name="location" slot="start" color="primary"></ion-icon>
+      <ion-label>
+        <h3>Selected Location</h3>
+        <p>{{ searchAddress }}</p>
+      </ion-label>
+    </ion-item>
+  </div>
+</ion-content>

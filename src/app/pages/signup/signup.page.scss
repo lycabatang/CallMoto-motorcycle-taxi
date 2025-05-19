@@ -1,0 +1,61 @@
+ion-content {
+  --background: linear-gradient(135deg, #1a237e, #0d47a1);
+}
+
+.signup-container {
+  padding: 16px;
+  max-width: 400px;
+  margin: 0 auto;
+
+  ion-item {
+    --background: rgba(255, 255, 255, 0.1);
+    --border-radius: 10px;
+    margin-bottom: 20px;
+    --highlight-height: 0;
+    
+    &::part(native) {
+      padding: 8px 16px;
+    }
+
+    ion-label {
+      color: rgba(255, 255, 255, 0.8);
+    }
+
+    ion-input, ion-textarea {
+      --color: white;
+    }
+  }
+
+  ion-button {
+    margin-top: 30px;
+    height: 48px;
+    --border-radius: 24px;
+    font-weight: 600;
+    --box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+
+    &[fill="clear"] {
+      --color: white;
+      font-weight: 500;
+      height: 40px;
+    }
+  }
+}
+
+.user-type-segment {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+  margin-bottom: 20px;
+  padding: 5px;
+
+  ion-segment-button {
+    --background: transparent;
+    --background-checked: rgba(255, 255, 255, 0.2);
+    --color: rgba(255, 255, 255, 0.8);
+    --color-checked: white;
+    --border-radius: 8px;
+    
+    &::part(indicator-background) {
+      background: transparent;
+    }
+  }
+}

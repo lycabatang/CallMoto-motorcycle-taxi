@@ -1,0 +1,64 @@
+<ion-content>
+  <div *ngIf="isLoading" class="loading-container">
+    <ion-spinner name="crescent"></ion-spinner>
+  </div>
+
+  <div *ngIf="!isLoading && rides.length > 0">
+    <ng-container *ngFor="let ride of rides">
+      <!-- Pending ride -->
+      <ion-card *ngIf="ride.status === 'pending'">
+        <ion-card-header>
+          <ion-card-title>Ride ID: {{ ride.bookingId }}</ion-card-title>
+        </ion-card-header>
+        <ion-card-content>
+          <p>Pickup: {{ ride.pickup }}</p>
+          <p>Dropoff: {{ ride.dropoff }}</p>
+          <p>Price: {{ ride.price | currency:'PHP' }}</p>
+        </ion-card-content>
+        <ion-button expand="block" color="success" (click)="acceptRide(ride)">
+          Accept
+        </ion-button>
+        <ion-button expand="block" color="danger" (click)="declineRide(ride)">
+          Decline
+        </ion-button>
+      </ion-card>
+
+      <!-- Accepted or In-progress or Completed -->
+      <ion-card *ngIf="ride.status !== 'pending' && ride.status !== 'declined'">
+        <ion-card-header>
+          <ion-card-title>Ride ID: {{ ride.bookingId }}</ion-card-title>
+        </ion-card-header>
+        <ion-card-content>
+          <p>Pickup: {{ ride.pickup }}</p>
+          <p>Dropoff: {{ ride.dropoff }}</p>
+          <p>Price: {{ ride.price | currency:'PHP' }}</p>
+          <p>Status: <strong>{{ ride.status }}</strong></p>
+        </ion-card-content>
+
+        <!-- Start Ride Button -->
+        <ion-button
+          *ngIf="ride.status === 'accepted'"
+          expand="block"
+          color="primary"
+          (click)="startRide(ride)">
+          Start Ride
+        </ion-button>
+
+        <!-- Complete Ride Button -->
+        <ion-button
+          *ngIf="ride.status === 'in-progress'"
+          expand="block"
+          color="success"
+          (click)="completeRide(ride)">
+          Complete Ride
+        </ion-button>
+      </ion-card>
+    </ng-container>
+  </div>
+
+  <div *ngIf="!isLoading && rides.length === 0">
+    <ion-text color="medium">
+      <p class="ion-padding">No rides found.</p>
+    </ion-text>
+  </div>
+</ion-content>

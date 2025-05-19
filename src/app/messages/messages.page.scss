@@ -1,0 +1,26 @@
+.message-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+
+  h2 {
+    margin: 0;
+    font-weight: 600;
+  }
+
+  .timestamp {
+    font-size: 0.8em;
+    color: var(--ion-color-medium);
+  }
+}
+
+.unread {
+  font-weight: 600;
+  color: var(--ion-color-dark);
+}
+
+ion-badge {
+  --padding-end: 8px;
+  --padding-start: 8px;
+}

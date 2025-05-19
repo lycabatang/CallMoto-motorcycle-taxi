@@ -1,0 +1,17 @@
+<ion-list>
+  <ion-item *ngFor="let ride of rides">
+    <ion-label>
+      <h2>{{ride.pickupLocation.address}} → {{ride.dropoffLocation.address}}</h2>
+      <h3>Rider: {{ride.riderName || 'Not assigned'}}</h3>
+      <p><ion-icon name="time-outline"></ion-icon> {{ride.updatedAt.toDate() | date:'short'}}</p>
+      <p><ion-icon name="trail-sign-outline"></ion-icon> {{ride.distance}} km</p>
+      <p><ion-icon name="cash-outline"></ion-icon> ₱{{ride.price}}</p>
+      <p>
+        <ion-icon name="star" *ngFor="let i of [1, 2, 3, 4, 5]" 
+                  [color]="i <= ride.rating ? 'warning' : 'medium'">
+        </ion-icon>
+      </p>
+      <ion-badge color="success">{{ride.status}}</ion-badge>
+    </ion-label>
+  </ion-item>
+</ion-list>

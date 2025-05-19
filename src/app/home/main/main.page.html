@@ -1,0 +1,13 @@
+<div class="motorcycle-grid">
+  <ion-card *ngFor="let motorcycle of motorcycles">
+    <img [src]="motorcycle.image" alt="motorcycle"/>
+    <ion-card-header>
+      <ion-card-title>{{motorcycle.model}}</ion-card-title>
+      <ion-card-subtitle>{{motorcycle.brand}}</ion-card-subtitle>
+    </ion-card-header>
+    <ion-card-content>
+      <p>{{motorcycle.price}}</p>
+      <ion-button expand="block">View Details</ion-button>
+    </ion-card-content>
+  </ion-card>
+</div>
