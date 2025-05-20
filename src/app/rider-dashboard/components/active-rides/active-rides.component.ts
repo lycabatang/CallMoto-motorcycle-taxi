@@ -63,39 +63,69 @@ export class ActiveRidesComponent implements OnInit, OnDestroy {
   }
 
   async listenToActiveRides() {
+    if (!this.rider) return;
+  
     this.isLoading = true;
-
-    const bookingsRef = collection(this.firestore, 'bookings') as CollectionReference;
-    const q = query(
-      bookingsRef,
-      where('status', 'in', ['pending', 'accepted', 'in-progress'])
-    );
-
     const loading = await this.loadingCtrl.create({ message: 'Loading rides...' });
     await loading.present();
-
-    // Subscribe to real-time updates
-    this.unsubscribeRides = onSnapshot(q, (querySnapshot) => {
+  
+    const bookingsRef = collection(this.firestore, 'bookings') as CollectionReference;
+  
+    const qAssigned = query(
+      bookingsRef,
+      where('status', 'in', ['pending', 'accepted', 'in-progress']),
+      where('riderId', '==', this.rider.uid)
+    );
+  
+    const qUnassigned = query(
+      bookingsRef,
+      where('status', 'in', ['pending', 'accepted', 'in-progress']),
+      where('riderId', '==', null)
+    );
+  
+    const unsubscribeAssigned = onSnapshot(qAssigned, (assignedSnap) => {
+      const assignedRides = assignedSnap.docs.map(doc => {
+        const data = doc.data();
+        return {
+          bookingId: doc.id,
+          pickup: `${data['pickupLocation'].latitude}, ${data['pickupLocation'].longitude}`,
+          dropoff: `${data['dropoffLocation'].latitude}, ${data['dropoffLocation'].longitude}`,
+          status: data['status'],
+          price: data['price'] ?? 0
+        } as Ride;
+      });
+  
       this.ngZone.run(() => {
-        this.rides = querySnapshot.docs.map(doc => {
-          const data = doc.data();
-          return {
-            bookingId: doc.id,
-            pickup: `${data['pickupLocation'].latitude}, ${data['pickupLocation'].longitude}`,
-            dropoff: `${data['dropoffLocation'].latitude}, ${data['dropoffLocation'].longitude}`,
-            status: data['status'],
-            price: data['price'] ?? 0
-          } as Ride;
-        });
+        this.rides = [...assignedRides];
         this.isLoading = false;
       });
       loading.dismiss();
-    }, (error) => {
-      console.error('Error fetching rides in real-time:', error);
-      this.isLoading = false;
-      loading.dismiss();
     });
+  
+    const unsubscribeUnassigned = onSnapshot(qUnassigned, (unassignedSnap) => {
+      const unassignedRides = unassignedSnap.docs.map(doc => {
+        const data = doc.data();
+        return {
+          bookingId: doc.id,
+          pickup: `${data['pickupLocation'].latitude}, ${data['pickupLocation'].longitude}`,
+          dropoff: `${data['dropoffLocation'].latitude}, ${data['dropoffLocation'].longitude}`,
+          status: data['status'],
+          price: data['price'] ?? 0
+        } as Ride;
+      });
+  
+      this.ngZone.run(() => {
+        this.rides = [...this.rides.filter(r => r.status !== 'pending'), ...unassignedRides];
+      });
+    });
+  
+    // Save both unsubscribe functions so you can clean them up
+    this.unsubscribeRides = () => {
+      unsubscribeAssigned();
+      unsubscribeUnassigned();
+    };
   }
+  
 
   // Your accept, decline, start, complete methods remain unchanged
 
