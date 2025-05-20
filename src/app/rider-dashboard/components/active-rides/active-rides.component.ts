@@ -108,8 +108,8 @@ export class ActiveRidesComponent implements OnInit, OnDestroy {
         const data = doc.data();
         return {
           bookingId: doc.id,
-          pickup: `${data['pickupLocation'].latitude}, ${data['pickupLocation'].longitude}`,
-          dropoff: `${data['dropoffLocation'].latitude}, ${data['dropoffLocation'].longitude}`,
+          pickup: data['pickupLocation'].address ?? `${data['pickupLocation'].latitude}, ${data['pickupLocation'].longitude}`,
+dropoff: data['dropoffLocation'].address ?? `${data['dropoffLocation'].latitude}, ${data['dropoffLocation'].longitude}`,
           status: data['status'],
           price: data['price'] ?? 0
         } as Ride;
