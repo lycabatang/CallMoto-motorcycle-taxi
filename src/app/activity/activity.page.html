@@ -1,17 +1,145 @@
-<ion-list>
-  <ion-item *ngFor="let ride of rides">
-    <ion-label>
-      <h2>{{ride.pickupLocation.address}} → {{ride.dropoffLocation.address}}</h2>
-      <h3>Rider: {{ride.riderName || 'Not assigned'}}</h3>
-      <p><ion-icon name="time-outline"></ion-icon> {{ride.updatedAt.toDate() | date:'short'}}</p>
-      <p><ion-icon name="trail-sign-outline"></ion-icon> {{ride.distance}} km</p>
-      <p><ion-icon name="cash-outline"></ion-icon> ₱{{ride.price}}</p>
-      <p>
-        <ion-icon name="star" *ngFor="let i of [1, 2, 3, 4, 5]" 
-                  [color]="i <= ride.rating ? 'warning' : 'medium'">
-        </ion-icon>
-      </p>
-      <ion-badge color="success">{{ride.status}}</ion-badge>
-    </ion-label>
-  </ion-item>
-</ion-list>
+<ion-content fullscreen>
+  <ion-segment [(ngModel)]="activeTab" (ionChange)="onTabChange(activeTab)" color="primary" style="padding: 1em;">
+    <ion-segment-button value="active">Active Rides</ion-segment-button>
+    <ion-segment-button value="completed">Completed Rides</ion-segment-button>
+    <ion-segment-button value="history">History</ion-segment-button>
+  </ion-segment>
+
+  <ion-list *ngIf="!isLoading">
+    <!-- Active rides -->
+    <ng-container *ngIf="activeTab === 'active'">
+      <ion-list *ngIf="activeRides.length > 0; else noActiveRides" style="padding-bottom: 80px;">
+        <ion-item *ngFor="let ride of activeRides" lines="none">
+          <ion-label>
+            <h2>
+              <strong>Pickup:</strong> {{ ride.pickupLocation?.address || 'Unknown' }}<br />
+              <strong>Dropoff:</strong> {{ ride.dropoffLocation?.address || 'Unknown' }}
+            </h2>
+
+            <div *ngIf="ride.status === 'in-progress'" class="map-container" [id]="'map-' + ride.id"></div>
+
+            <p><ion-icon name="person-circle-outline"></ion-icon> <strong>Rider:</strong> {{ ride.riderName || 'Not assigned' }}</p>
+            <p><ion-icon name="time-outline"></ion-icon> {{ ride.updatedAt?.toDate() | date: 'short' }}</p>
+            <p><ion-icon name="trail-sign-outline"></ion-icon> {{ (ride.distance || 0) | number: '1.2-2' }} km</p>
+            <p><ion-icon name="cash-outline"></ion-icon> ₱{{ ride.price ?? 0 | number: '1.2-2' }}</p>
+
+            <ion-badge [color]="ride.status === 'in-progress' ? 'primary' : ride.status === 'completed' ? 'medium' : 'success'">
+              {{ ride.status }}
+            </ion-badge>
+          </ion-label>
+        </ion-item>
+      </ion-list>
+      <ng-template #noActiveRides>
+        <ion-item lines="none"><ion-label class="ion-text-center">No active or in-progress rides found.</ion-label></ion-item>
+      </ng-template>
+    </ng-container>
+
+    <!-- Completed rides -->
+    <ng-container *ngIf="activeTab === 'completed'">
+      <ion-list *ngIf="completedRides.length > 0; else noCompletedRides" style="padding-bottom: 80px;">
+        <ion-item *ngFor="let ride of completedRides" lines="none">
+          <ion-label>
+            <h2>
+              <strong>Pickup:</strong> {{ ride.pickupLocation?.address || 'Unknown' }}<br />
+              <strong>Dropoff:</strong> {{ ride.dropoffLocation?.address || 'Unknown' }}
+            </h2>
+
+            <p><ion-icon name="person-circle-outline"></ion-icon> <strong>Rider:</strong> {{ ride.riderName || 'Not assigned' }}</p>
+            <p><ion-icon name="time-outline"></ion-icon> {{ ride.updatedAt?.toDate() | date: 'short' }}</p>
+            <p><ion-icon name="trail-sign-outline"></ion-icon> {{ (ride.distance || 0) | number: '1.2-2' }} km</p>
+            <p><ion-icon name="cash-outline"></ion-icon> ₱{{ ride.price ?? 0 | number: '1.2-2' }}</p>
+
+            <ion-badge color="medium">{{ ride.status }}</ion-badge>
+
+            <!-- Feedback Section -->
+            <div *ngIf="!ride.customerFeedbackSubmitted">
+              <ion-item lines="none">
+                <ion-label position="floating">Your Feedback</ion-label>
+                <ion-textarea [(ngModel)]="ride.customerFeedback" rows="3"></ion-textarea>
+              </ion-item>
+
+              <ion-item lines="none">
+                <ion-label>Rate Rider</ion-label>
+                <div class="star-rating">
+                  <ion-icon
+                    *ngFor="let star of [1,2,3,4,5]"
+                    [name]="star <= (ride.customerRating || 0) ? 'star' : 'star-outline'"
+                    (click)="setRating(ride, star)"
+                    class="star"
+                  ></ion-icon>
+                </div>
+              </ion-item>
+
+              <ion-button expand="block" (click)="submitFeedback(ride)" [disabled]="!ride.customerFeedback || !ride.customerRating">
+                Submit Feedback
+              </ion-button>
+            </div>
+
+            <!-- Thank You -->
+            <div *ngIf="ride.customerFeedback && ride.customerRating" class="ion-text-center">
+              <p><strong>Your Feedback:</strong> {{ ride.customerFeedback }}</p>
+              <p>
+                <strong>Your Rating:</strong>
+                <span class="star-rating">
+                  <ion-icon *ngFor="let star of [1,2,3,4,5]" [name]="star <= ride.customerRating ? 'star' : 'star-outline'" class="star"></ion-icon>
+                </span>
+              </p>
+              <ion-icon name="checkmark-circle" color="success" size="large"></ion-icon>
+              <p>Thank you for your feedback!</p>
+            </div>
+          </ion-label>
+        </ion-item>
+      </ion-list>
+
+      <ng-template #noCompletedRides>
+        <ion-item lines="none"><ion-label class="ion-text-center">No completed rides found.</ion-label></ion-item>
+      </ng-template>
+    </ng-container>
+
+   <!-- History rides -->
+<ng-container *ngIf="activeTab === 'history'">
+  <ion-list *ngIf="historyRides.length > 0; else noHistoryRides" style="padding-bottom: 80px;">
+    <ion-item *ngFor="let ride of historyRides" lines="none">
+      <ion-label>
+        <h2>
+          <strong>Pickup:</strong> {{ ride.pickupLocation?.address || 'Unknown' }}<br />
+          <strong>Dropoff:</strong> {{ ride.dropoffLocation?.address || 'Unknown' }}
+        </h2>
+
+        <p><ion-icon name="person-circle-outline"></ion-icon> <strong>Rider:</strong> {{ ride.riderName || 'Not assigned' }}</p>
+        <p><ion-icon name="time-outline"></ion-icon> {{ ride.updatedAt?.toDate() | date: 'short' }}</p>
+        <p><ion-icon name="trail-sign-outline"></ion-icon> {{ (ride.distance || 0) | number: '1.2-2' }} km</p>
+        <p><ion-icon name="cash-outline"></ion-icon> ₱{{ ride.price ?? 0 | number: '1.2-2' }}</p>
+
+        <ion-badge color="tertiary">{{ ride.status }}</ion-badge>
+
+        <!-- Show feedback & rating if available -->
+        <div *ngIf="ride.customerFeedback && ride.customerRating" class="ion-text-center" style="margin-top: 1em;">
+          <p><strong>Your Feedback:</strong> {{ ride.customerFeedback }}</p>
+          <p>
+            <strong>Your Rating:</strong>
+            <span class="star-rating">
+              <ion-icon *ngFor="let star of [1,2,3,4,5]" [name]="star <= ride.customerRating ? 'star' : 'star-outline'" class="star"></ion-icon>
+            </span>
+          </p>
+          <ion-icon name="checkmark-circle" color="success" size="large"></ion-icon>
+          <p>Thank you for your feedback!</p>
+        </div>
+
+        <!-- Optional: show a placeholder if no feedback -->
+        <div *ngIf="!ride.customerFeedback || !ride.customerRating" style="margin-top: 1em;">
+          <p><em>No feedback submitted yet.</em></p>
+        </div>
+      </ion-label>
+    </ion-item>
+  </ion-list>
+
+  <ng-template #noHistoryRides>
+    <ion-item lines="none"><ion-label class="ion-text-center">No history rides found.</ion-label></ion-item>
+  </ng-template>
+</ng-container>
+
+  </ion-list>
+
+  <ion-spinner *ngIf="isLoading" name="crescent" class="loading-spinner"></ion-spinner>
+</ion-content>

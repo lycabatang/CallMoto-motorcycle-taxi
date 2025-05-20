@@ -1,13 +1,12 @@
 import { Component, OnInit } from '@angular/core';
 import { Router, RouterModule, NavigationEnd } from '@angular/router';
-import { IonicModule, ModalController } from '@ionic/angular';
+import { IonicModule, ModalController, AlertController } from '@ionic/angular';
 import { LocationPickerComponent, LocationData } from '../location/location-picker.component';
 import { BookingService } from '../services/booking.service';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { filter } from 'rxjs/operators';
+import { filter, firstValueFrom } from 'rxjs';
 import { FindingRiderModalComponent } from '../finding-rider/finding-rider-modal.component';
-import { firstValueFrom } from 'rxjs';
 import { Auth } from '@angular/fire/auth';
 
 @Component({
@@ -36,6 +35,7 @@ export class HomePage implements OnInit {
   constructor(
     public router: Router,
     private modalCtrl: ModalController,
+    private alertCtrl: AlertController,
     private bookingService: BookingService,
     private auth: Auth
   ) {}
@@ -78,12 +78,10 @@ export class HomePage implements OnInit {
               Math.sin(dlon / 2) * Math.sin(dlon / 2);
     const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 
-    const distance = R * c;
-    return distance;
+    return R * c;
   }
 
   async openPickupLocationPicker() {
-    console.log('Opening Pickup Modal');
     try {
       const modal = await this.modalCtrl.create({
         component: LocationPickerComponent,
@@ -102,7 +100,6 @@ export class HomePage implements OnInit {
   }
 
   async openDropoffLocationPicker() {
-    console.log('Opening Destination Modal');
     try {
       const modal = await this.modalCtrl.create({
         component: LocationPickerComponent,
@@ -131,20 +128,32 @@ export class HomePage implements OnInit {
       return;
     }
 
-    // Calculate distance and price
+    // 🚫 Check if user has an ongoing ride
+    const hasOngoing = await this.bookingService.hasOngoingBooking(this.userId);
+    if (hasOngoing) {
+      const alert = await this.alertCtrl.create({
+        header: 'Ongoing Ride',
+        message: 'You already have an ongoing ride. Please complete it before booking another.',
+        buttons: ['OK']
+      });
+      await alert.present();
+      return;
+    }
+
     const distance = this.calculateDistance(this.pickupLocation, this.dropoffLocation);
-    const pricePerKm = 30;
-    const price = 40 + (distance * pricePerKm);
+    const price = 40 + (distance * 30);
 
     const bookingData = {
       customerId: this.userId,
       pickupLocation: {
         latitude: this.pickupLocation.latitude,
-        longitude: this.pickupLocation.longitude
+        longitude: this.pickupLocation.longitude,
+        address: this.pickupLocation.address
       },
       dropoffLocation: {
         latitude: this.dropoffLocation.latitude,
-        longitude: this.dropoffLocation.longitude
+        longitude: this.dropoffLocation.longitude,
+        address: this.dropoffLocation.address
       },
       status: 'pending',
       riderId: null,
@@ -166,14 +175,14 @@ export class HomePage implements OnInit {
         componentProps: {
           distance: createdBooking.distance,
           price: createdBooking.price,
-          bookingId: bookingId,
-          userLat: this.pickupLocation.latitude,   // Pass pickup latitude
-          userLng: this.pickupLocation.longitude   // Pass pickup longitude
+          bookingId,
+          userLat: this.pickupLocation.latitude,
+          userLng: this.pickupLocation.longitude
         },
         backdropDismiss: false,
         showBackdrop: true
       });
-      
+
       await modal.present();
     } catch (error) {
       console.error('Error creating booking or opening modal:', error);
