@@ -92,12 +92,23 @@ export class HomePage implements OnInit {
       await modal.present();
       const { data } = await modal.onDidDismiss();
       if (data) {
+        // Check if address contains "Tuguegarao City"
+        if (!data.address.toLowerCase().includes('tuguegarao')) {
+          const alert = await this.alertCtrl.create({
+            header: 'Invalid Location',
+            message: 'Please select a location within Tuguegarao City only.',
+            buttons: ['OK']
+          });
+          await alert.present();
+          return;
+        }
         this.pickupLocation = data;
       }
     } catch (error) {
       console.error('Error opening pickup modal:', error);
     }
   }
+  
 
   async openDropoffLocationPicker() {
     try {
@@ -110,12 +121,22 @@ export class HomePage implements OnInit {
       await modal.present();
       const { data } = await modal.onDidDismiss();
       if (data) {
+        if (!data.address.toLowerCase().includes('tuguegarao')) {
+          const alert = await this.alertCtrl.create({
+            header: 'Invalid Location',
+            message: 'Please select a location within Tuguegarao City only.',
+            buttons: ['OK']
+          });
+          await alert.present();
+          return;
+        }
         this.dropoffLocation = data;
       }
     } catch (error) {
       console.error('Error opening dropoff modal:', error);
     }
   }
+  
 
   async findRiders() {
     if (!this.pickupLocation.latitude || !this.dropoffLocation.latitude) {
