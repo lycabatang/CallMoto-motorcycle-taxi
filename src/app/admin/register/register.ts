@@ -40,15 +40,44 @@ export class Register implements OnInit {
       address: ['', Validators.required],
 
       // Rider-specific
-      motorcycleModel: [''],
-      plateNumber: [''],
-      licenseNumber: [''],
-      nbiClearance: [''],
+      motorcycleModel: ['', Validators.required],
+      plateNumber: [
+        '',
+        Validators.pattern(/^[A-Z]{2}\s?\d{5}$/) // e.g., MC 12345 or MC12345
+      ],
+      licenseNumber: [
+        '',
+        [Validators.required, Validators.pattern(/^[A-Z]{1}\d{2}-\d{2}-\d{6}$/)],
+      ],
+      nbiClearance: [
+        '',
+        [Validators.required, Validators.pattern(/^\d{9,12}$/)],
+      ],
     });
   }
 
   ngOnInit(): void {}
 
+  motorcycleModels: string[] = [
+    'Honda Click 125i',
+    'Yamaha Mio i 125',
+    'Honda BeAT',
+    'Yamaha NMAX',
+    'Suzuki Raider 150',
+    'Honda ADV 160',
+    'Yamaha Aerox 155',
+    'Suzuki Skydrive 125',
+    'Rusi Flash 150',
+    'Motorstar Xplorer 150R',
+    'Suzuki Burgman Street 125',
+    'Honda PCX 160',
+    'Yamaha Sniper 150',
+    'Kawasaki Barako II',
+    'Honda TMX Supremo 150'
+  ];
+  
+
+  
   isRider(): boolean {
     return this.registerForm.get('userType')?.value === 'rider';
   }

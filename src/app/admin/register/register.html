@@ -82,24 +82,45 @@
 
     <ng-container *ngIf="isRider()">
       <ion-item>
-        <ion-label position="floating">Motorcycle Model</ion-label>
-        <ion-input formControlName="motorcycleModel"></ion-input>
+        <ion-label>Motorcycle Model <span class="required-star">*</span></ion-label>
+        <ion-select formControlName="motorcycleModel" interface="popover">
+          <ion-select-option *ngFor="let model of motorcycleModels" [value]="model">
+            {{ model }}
+          </ion-select-option>
+        </ion-select>
       </ion-item>
+      <ion-text color="danger" *ngIf="registerForm.get('motorcycleModel')?.invalid && (registerForm.get('motorcycleModel')?.touched || registerForm.get('motorcycleModel')?.dirty)">
+        <small>Motorcycle model is required.</small>
+      </ion-text>
+      
 
       <ion-item>
         <ion-label position="floating">Plate Number</ion-label>
         <ion-input formControlName="plateNumber"></ion-input>
       </ion-item>
+      <ion-text color="danger" *ngIf="registerForm.get('plateNumber')?.invalid && (registerForm.get('plateNumber')?.touched || registerForm.get('plateNumber')?.dirty)">
+        <small *ngIf="registerForm.get('plateNumber')?.errors?.['pattern']">
+          Plate number must be in the format "AA 12345"
+        </small>
+      </ion-text>
 
       <ion-item>
-        <ion-label position="floating">License Number</ion-label>
+        <ion-label position="floating">License Number <span class="required-star">*</span></ion-label>
         <ion-input formControlName="licenseNumber"></ion-input>
       </ion-item>
+      <ion-text color="danger" *ngIf="registerForm.get('licenseNumber')?.invalid && (registerForm.get('licenseNumber')?.touched || registerForm.get('licenseNumber')?.dirty)">
+        <small *ngIf="registerForm.get('licenseNumber')?.errors?.['required']">License number is required.</small>
+        <small *ngIf="registerForm.get('licenseNumber')?.errors?.['pattern']">Format must be like N12-34-567890.</small>
+      </ion-text>
 
       <ion-item>
-        <ion-label position="floating">NBI Clearance #</ion-label>
-        <ion-input formControlName="nbiClearance"></ion-input>
+        <ion-label position="floating">NBI Clearance # <span class="required-star">*</span></ion-label>
+        <ion-input formControlName="nbiClearance" type="number"></ion-input>
       </ion-item>
+      <ion-text color="danger" *ngIf="registerForm.get('nbiClearance')?.invalid && (registerForm.get('nbiClearance')?.touched || registerForm.get('nbiClearance')?.dirty)">
+        <small *ngIf="registerForm.get('nbiClearance')?.errors?.['required']">NBI clearance number is required.</small>
+        <small *ngIf="registerForm.get('nbiClearance')?.errors?.['pattern']">Must be 9 to 12 digits.</small>
+      </ion-text>
     </ng-container>
 
     <ion-button expand="block" type="submit">Register</ion-button>
