@@ -7,8 +7,8 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { filter } from 'rxjs/operators';
 import { FindingRiderModalComponent } from '../finding-rider/finding-rider-modal.component';
-import { firstValueFrom } from 'rxjs';  // For converting Observable to Promise
-import { Auth } from '@angular/fire/auth';  // Import Firebase Auth
+import { firstValueFrom } from 'rxjs';
+import { Auth } from '@angular/fire/auth';
 
 @Component({
   selector: 'app-home',
@@ -37,16 +37,15 @@ export class HomePage implements OnInit {
     public router: Router,
     private modalCtrl: ModalController,
     private bookingService: BookingService,
-    private auth: Auth  // Inject Firebase Auth service
+    private auth: Auth
   ) {}
 
   ngOnInit() {
     console.log("HomePage initialized");
 
-    // Get the current user ID from Firebase Auth
     this.auth.onAuthStateChanged(user => {
       if (user) {
-        this.userId = user.uid;  // Save the user ID
+        this.userId = user.uid;
         console.log("Current User ID:", this.userId);
       } else {
         console.log("No user is signed in");
@@ -79,7 +78,7 @@ export class HomePage implements OnInit {
               Math.sin(dlon / 2) * Math.sin(dlon / 2);
     const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 
-    const distance = R * c; // Distance in km
+    const distance = R * c;
     return distance;
   }
 
@@ -98,45 +97,47 @@ export class HomePage implements OnInit {
         this.pickupLocation = data;
       }
     } catch (error) {
-      console.error('Error creating modal:', error);
+      console.error('Error opening pickup modal:', error);
     }
   }
 
   async openDropoffLocationPicker() {
     console.log('Opening Destination Modal');
-    const modal = await this.modalCtrl.create({
-      component: LocationPickerComponent,
-      componentProps: {
-        initialLocation: this.dropoffLocation.latitude ? this.dropoffLocation : null
+    try {
+      const modal = await this.modalCtrl.create({
+        component: LocationPickerComponent,
+        componentProps: {
+          initialLocation: this.dropoffLocation.latitude ? this.dropoffLocation : null
+        }
+      });
+      await modal.present();
+      const { data } = await modal.onDidDismiss();
+      if (data) {
+        this.dropoffLocation = data;
       }
-    });
-
-    await modal.present();
-
-    const { data } = await modal.onDidDismiss();
-    if (data) {
-      this.dropoffLocation = data;
+    } catch (error) {
+      console.error('Error opening dropoff modal:', error);
     }
   }
 
   async findRiders() {
-    console.log('find riders');
     if (!this.pickupLocation.latitude || !this.dropoffLocation.latitude) {
       console.error('Pickup and/or Dropoff location not selected');
       return;
     }
 
-    // Calculate distance
+    if (!this.userId) {
+      console.error('User is not authenticated');
+      return;
+    }
+
+    // Calculate distance and price
     const distance = this.calculateDistance(this.pickupLocation, this.dropoffLocation);
-
-    // Price per kilometer
     const pricePerKm = 30;
-
-    // Calculate the price based on the distance
     const price = 40 + (distance * pricePerKm);
-    console.log("this", this);
+
     const bookingData = {
-      customerId: this.userId,  // Use the current user ID
+      customerId: this.userId,
       pickupLocation: {
         latitude: this.pickupLocation.latitude,
         longitude: this.pickupLocation.longitude
@@ -147,37 +148,35 @@ export class HomePage implements OnInit {
       },
       status: 'pending',
       riderId: null,
-      distance: distance, // Include computed distance
-      price: price, // Include calculated price
+      distance,
+      price,
       createdAt: new Date(),
       updatedAt: new Date()
     };
 
-    console.log('Booking Data:', bookingData);
-
     try {
-      // Creating booking
       const bookingId: string = await this.bookingService.createBooking(bookingData);
-      console.log('Booking created successfully');
+      console.log('Booking created successfully with ID:', bookingId);
 
-      // Fetch the full booking data using bookingId
-      const createdBooking = await firstValueFrom(this.bookingService.getBookingById(bookingId)); // Using firstValueFrom to convert Observable to Promise
-      console.log('Created Booking:', createdBooking);
+      const createdBooking = await firstValueFrom(this.bookingService.getBookingById(bookingId));
+      console.log('Fetched created booking:', createdBooking);
 
-      // Show loading modal
       const modal = await this.modalCtrl.create({
         component: FindingRiderModalComponent,
         componentProps: {
           distance: createdBooking.distance,
           price: createdBooking.price,
-          bookingId: bookingId  // Pass bookingId to the modal
+          bookingId: bookingId,
+          userLat: this.pickupLocation.latitude,   // Pass pickup latitude
+          userLng: this.pickupLocation.longitude   // Pass pickup longitude
         },
         backdropDismiss: false,
         showBackdrop: true
       });
+      
       await modal.present();
     } catch (error) {
-      console.error('Error creating booking', error);
+      console.error('Error creating booking or opening modal:', error);
     }
   }
 }

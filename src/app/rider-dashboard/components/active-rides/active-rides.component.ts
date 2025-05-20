@@ -1,20 +1,20 @@
-import { Component, OnInit, NgZone } from '@angular/core';
+import { Component, OnInit, OnDestroy, NgZone } from '@angular/core';
 import {
   collection,
-  getDocs,
   query,
   where,
   CollectionReference,
   doc,
   updateDoc,
   serverTimestamp,
+  onSnapshot,
+  Unsubscribe,
 } from '@angular/fire/firestore';
 import { IonicModule, LoadingController } from '@ionic/angular';
 import { CommonModule } from '@angular/common';
 import { Firestore } from '@angular/fire/firestore';
 import { Auth, onAuthStateChanged, User } from '@angular/fire/auth';
 import { Router } from '@angular/router';
-
 
 interface Ride {
   bookingId: string;
@@ -31,10 +31,11 @@ interface Ride {
   standalone: true,
   imports: [IonicModule, CommonModule],
 })
-export class ActiveRidesComponent implements OnInit {
+export class ActiveRidesComponent implements OnInit, OnDestroy {
   rides: Ride[] = [];
   rider: User | null = null;
   isLoading = false;
+  private unsubscribeRides?: Unsubscribe;
 
   constructor(
     private firestore: Firestore,
@@ -48,28 +49,33 @@ export class ActiveRidesComponent implements OnInit {
     onAuthStateChanged(this.auth, (user) => {
       if (user) {
         this.rider = user;
-        this.loadActiveRides();
+        this.listenToActiveRides();
       } else {
         console.warn('No rider is signed in');
       }
     });
   }
 
-  async loadActiveRides() {
-    this.isLoading = true;
-    const bookingsRef = collection(this.firestore, 'bookings') as CollectionReference;
+  ngOnDestroy() {
+    if (this.unsubscribeRides) {
+      this.unsubscribeRides();
+    }
+  }
 
+  async listenToActiveRides() {
+    this.isLoading = true;
+
+    const bookingsRef = collection(this.firestore, 'bookings') as CollectionReference;
     const q = query(
       bookingsRef,
       where('status', 'in', ['pending', 'accepted', 'in-progress'])
     );
 
-
     const loading = await this.loadingCtrl.create({ message: 'Loading rides...' });
     await loading.present();
 
-    try {
-      const querySnapshot = await getDocs(q);
+    // Subscribe to real-time updates
+    this.unsubscribeRides = onSnapshot(q, (querySnapshot) => {
       this.ngZone.run(() => {
         this.rides = querySnapshot.docs.map(doc => {
           const data = doc.data();
@@ -81,14 +87,17 @@ export class ActiveRidesComponent implements OnInit {
             price: data['price'] ?? 0
           } as Ride;
         });
+        this.isLoading = false;
       });
-    } catch (error) {
-      console.error('Error fetching rides:', error);
-    } finally {
+      loading.dismiss();
+    }, (error) => {
+      console.error('Error fetching rides in real-time:', error);
       this.isLoading = false;
-      await loading.dismiss();
-    }
+      loading.dismiss();
+    });
   }
+
+  // Your accept, decline, start, complete methods remain unchanged
 
   async declineRide(ride: Ride) {
     const bookingRef = doc(this.firestore, 'bookings', ride.bookingId);

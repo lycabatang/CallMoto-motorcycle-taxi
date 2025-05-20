@@ -78,6 +78,7 @@ export class Register implements OnInit {
 
   async onSubmit() {
     if (!this.registerForm.valid) {
+      this.registerForm.markAllAsTouched();
       const toast = await this.toastCtrl.create({
         message: 'Please fill in all required fields correctly.',
         duration: 2000,
